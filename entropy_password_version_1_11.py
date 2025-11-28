@@ -13,23 +13,11 @@ import time
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 import math
-import importlib
-import subprocess
 import threading
 
-
-def _lazy_import(module_name: str, package_name: Optional[str] = None):
-    try:
-        return importlib.import_module(module_name)
-    except ImportError:
-        pkg = package_name or module_name
-        print(f"[entropy-1.11] Instalando dependencia requerida: {pkg} ...")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", pkg])
-        return importlib.import_module(module_name)
-
-
-np = _lazy_import("numpy")
-cv2 = _lazy_import("cv2", "opencv-python")
+# Importar directamente sin auto-instalación
+import numpy as np
+import cv2
 
 
 class CameraOpenError(RuntimeError):
