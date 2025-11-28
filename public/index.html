@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entropy - Generador de Contraseñas Seguras</title>
+    <link rel="stylesheet" href="landing.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="container">
+        <div class="logo">
+            <div class="logo-icon">E</div>
+            <div class="logo-text">entropy</div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#features">Características</a></li>
+                <li><a href="#plans">Planes</a></li>
+                <li><a href="#about">Nosotros</a></li>
+            </ul>
+        </nav>
+        <div class="auth-buttons">
+            <button class="login-btn">Iniciar Sesión</button>
+            <button class="signup-btn">Registrarse</button>
+        </div>
+    </header>
+    
+    <section class="hero container">
+        <div class="hero-content">
+            <h1>Contraseñas seguras, generadas al instante</h1>
+            <p>Protege tus cuentas con contraseñas únicas y seguras con la ayuda de tu cámara.</p>
+            <div class="hero-buttons">
+                <button class="cta-button" onclick="window.location.href='generator.html'">Probar Generador</button>
+                <button class="demo-button" onclick="generateDemoPassword()">Demo Rápido</button>
+            </div>
+            <div class="demo-section" id="demoSection" style="display: none;">
+                <div class="demo-controls">
+                    <label for="demoLength">Longitud: <span id="lengthValue">16</span></label>
+                    <input type="range" id="demoLength" min="10" max="30" value="16" oninput="updateLength(this.value)">
+                </div>
+                <div class="password-result">
+                    <input type="text" id="demoPassword" readonly placeholder="Generando...">
+                    <button class="copy-demo-btn" onclick="copyDemoPassword()">📋</button>
+                </div>
+                <div class="demo-status" id="demoStatus"></div>
+            </div>
+        </div>
+        <div class="hero-image">
+            <div class="hero-visual">
+                <div class="entropy-animation">
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                </div>
+                <div class="camera-icon">
+                    <i class="fas fa-camera"></i>
+                    <span>Entropía de Cámara</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="features" class="container">
+        <h2>Características</h2>
+        <div class="features">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Seguridad Avanzada</h3>
+                    <p>Algoritmos criptográficos de última generación.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-sync-alt"></i>
+                    <h3>Personalización</h3>
+                    <p>Ajusta la longitud y complejidad según tus necesidades.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-random"></i>
+                    <h3>Entropía Máxima</h3>
+                    <p>Múltiples fuentes de aleatoriedad para contraseñas únicas.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="plans" class="container">
+        <h2>Planes</h2>
+        <div class="plans-container">
+            <div class="plan-card">
+                <div class="plan-header">
+                    <h3>Básico</h3>
+                    <div class="price">Gratis</div>
+                </div>
+                <div class="plan-features">
+                    <ul>
+                        <li><i class="fas fa-check"></i> Generación básica</li>
+                        <li><i class="fas fa-check"></i> Hasta 20 caracteres</li>
+                        <li><i class="fas fa-times"></i> Sin almacenamiento</li>
+                    </ul>
+                </div>
+                <button class="plan-button" data-plan="basic" onclick="window.location.href='generator.html'">Comenzar</button>
+            </div>
+            
+            <div class="plan-card featured">
+                <div class="plan-badge">Popular</div>
+                <div class="plan-header">
+                    <h3>Premium</h3>
+                    <div class="price">$4.99 <span>/ mes</span></div>
+                </div>
+                <div class="plan-features">
+                    <ul>
+                        <li><i class="fas fa-check"></i> Todo lo del plan Básico</li>
+                        <li><i class="fas fa-check"></i> Longitud ilimitada</li>
+                        <li><i class="fas fa-check"></i> Almacenamiento seguro</li>
+                    </ul>
+                </div>
+                <button class="plan-button" data-plan="premium" onclick="showComingSoon()">Elegir</button>
+            </div>
+            
+            <div class="plan-card">
+                <div class="plan-header">
+                    <h3>Empresas</h3>
+                    <div class="price">$9.99 <span>/ usuario</span></div>
+                </div>
+                <div class="plan-features">
+                    <ul>
+                        <li><i class="fas fa-check"></i> Todo lo del plan Premium</li>
+                        <li><i class="fas fa-check"></i> Panel de administración</li>
+                        <li><i class="fas fa-check"></i> Soporte prioritario</li>
+                    </ul>
+                </div>
+                <button class="plan-button" data-plan="business" onclick="showComingSoon()">Contactar</button>
+            </div>
+        </div>
+    </section>
+    
+    <section id="about" class="container">
+        <h2>Sobre Nosotros</h2>
+        <div class="about-content">
+            <div class="about-text">
+                <p>Somos un grupo de estudiantes de ingeniería que quieren hacer el entorno digital un entorno más seguro. Entropy propone una manera más segura para gestionar tus contraseñas.</p>
+            </div>
+        </div>
+    </section>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <div class="logo-icon">E</div>
+                    <div class="logo-text">entropy</div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2023 Entropy. Todos los derechos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Iniciar Sesión</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Contraseña</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="submit-btn">Iniciar Sesión</button>
+                <div class="form-footer">
+                    <p>¿No tienes una cuenta? <a href="#" id="switchToSignup">Regístrate</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Signup Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Crear Cuenta</h2>
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="signupName">Nombre</label>
+                    <input type="text" id="signupName" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Contraseña</label>
+                    <input type="password" id="signupPassword" required>
+                </div>
+                <button type="submit" class="submit-btn">Registrarse</button>
+                <div class="form-footer">
+                    <p>¿Ya tienes una cuenta? <a href="#" id="switchToLogin">Inicia Sesión</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <footer style="text-align: center; padding: 30px 20px; background-color: var(--panel-bg); margin-top: 50px; border-top: 1px solid var(--border-color);">
+        <p style="color: var(--text-secondary); margin-bottom: 10px;">© 2025 Entropy - Generador de contraseñas seguras</p>
+        <p style="color: var(--text-secondary);">
+            <a href="privacy.html" style="color: var(--accent-color); text-decoration: none; margin: 0 10px;">Privacidad</a> | 
+            <a href="https://github.com/tu-repo" target="_blank" style="color: var(--accent-color); text-decoration: none; margin: 0 10px;">Código Fuente</a>
+        </p>
+    </footer>
+    
+    <script src="landing.js"></script>
+</body>
+</html>

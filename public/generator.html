@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entropy - Generador de contraseñas</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span class="logo-icon">E</span>
+                <span class="logo-text">entropy</span>
+            </div>
+            <nav>
+                <ul>
+                    <li class="active"><a href="generator.html">Generador</a></li>
+                    <li><a href="index.html">Inicio</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <div class="generator-section">
+                <h1>Generador de contraseñas</h1>
+
+                <div class="generator-container">
+                    <div class="generator-panel">
+                        <div class="form-group">
+                            <div class="form-row">
+                                <label for="length">Longitud (4-30 caracteres)</label>
+                            </div>
+                            <div class="input-container">
+                                <input type="number" id="length" min="4" max="30" value="20" class="length-input" placeholder="Ingrese longitud">
+                            </div>
+                            <div id="length-error" class="error-message" style="display: none;"></div>
+                        </div>
+
+                        <div class="form-group">
+    <div class="form-row">
+        <label>Contraseña generada</label>
+    </div>
+    <input
+        type="text"
+        id="password-output"
+        readonly
+        placeholder="Pulsa 'Copiar' para generar">
+</div>
+
+<button class="copy-btn">Copiar</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
