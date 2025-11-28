@@ -6,6 +6,17 @@
     <title>Entropy - Generador de contraseñas</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Modal de consentimiento de privacidad (reutilizable) */
+        .privacy-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:99999; }
+        .privacy-modal { background:#fff; color:#111; max-width:720px; width:92%; border-radius:10px; padding:20px; box-shadow:0 8px 30px rgba(0,0,0,0.2); }
+        .privacy-modal h3{ margin-top:0 }
+        .privacy-modal .buttons { text-align:right; margin-top:16px }
+        .privacy-modal .btn { margin-left:8px; padding:8px 14px; border-radius:6px; border:none; cursor:pointer }
+        .privacy-modal .btn.secondary { background:transparent; color:#0077cc }
+        .privacy-modal .btn.accept { background:#0077cc; color:#fff }
+        body.privacy-block { overflow:hidden }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -56,6 +67,19 @@
         </main>
     </div>
 
+    <!-- Modal de consentimiento de privacidad -->
+    <div id="privacyModalOverlay" class="privacy-modal-overlay" style="display:none;">
+        <div class="privacy-modal" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+            <h3 id="privacyTitle">Política de Privacidad</h3>
+            <p>La cámara solo se usará localmente en tu navegador para generar entropía. No enviamos imágenes ni videos a servidores. Revisa la <a href="privacy.html" target="_blank">política de privacidad</a> para más información.</p>
+            <div class="buttons">
+                <button class="btn secondary" id="privacyReadBtn">Leer política</button>
+                <button class="btn accept" id="privacyAcceptBtn">Aceptar y continuar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="privacy-consent.js"></script>
     <script src="script.js?v=2"></script>
 </body>
 </html>
