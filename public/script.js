@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Copy button functionality (conectado al backend Python vía Flask)
+    // Copy button functionality (captura cámara en el navegador)
 const copyBtn = document.querySelector('.copy-btn');
 const passwordOutput = document.getElementById('password-output');
 
@@ -42,19 +42,73 @@ if (copyBtn) {
 
         // Mostrar mensaje de carga
         const originalBtnText = copyBtn.textContent;
-        copyBtn.textContent = 'Generando...';
+        copyBtn.textContent = 'Capturando...';
         copyBtn.disabled = true;
         copyBtn.style.opacity = '0.7';
         copyBtn.style.cursor = 'not-allowed';
         
         if (passwordOutput) {
-            passwordOutput.value = 'Capturando desde la cámara...';
+            passwordOutput.value = 'Accediendo a la cámara...';
             passwordOutput.style.color = '#f39c12';
         }
 
+        let stream = null;
+        
         try {
-            // Llamada al backend Flask
-            const response = await fetch(`/api/password?length=${length}`);
+            // Solicitar acceso a la cámara
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { width: 640, height: 480 } 
+            });
+            
+            if (passwordOutput) {
+                passwordOutput.value = 'Capturando imagen...';
+            }
+            
+            // Crear elemento video para capturar
+            const video = document.createElement('video');
+            video.srcObject = stream;
+            video.autoplay = true;
+            
+            // Esperar a que el video esté listo
+            await new Promise((resolve) => {
+                video.onloadedmetadata = () => {
+                    video.play();
+                    resolve();
+                };
+            });
+            
+            // Esperar un poco para que la cámara se estabilice
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Capturar frame del video
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+            
+            // Extraer datos de píxeles
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const pixels = Array.from(imageData.data);
+            
+            // Detener la cámara
+            stream.getTracks().forEach(track => track.stop());
+            
+            if (passwordOutput) {
+                passwordOutput.value = 'Generando contraseña...';
+            }
+            
+            // Enviar datos al servidor
+            const response = await fetch('/api/password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    length: length,
+                    imageData: pixels
+                })
+            });
 
             if (!response.ok) {
                 let msg = 'Error en el servidor';
@@ -110,6 +164,11 @@ if (copyBtn) {
         } catch (error) {
             console.error('Error al generar/copiar la contraseña:', error);
             
+            // Detener la cámara si está activa
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            
             // Restaurar estado del botón en caso de error
             copyBtn.textContent = originalBtnText;
             copyBtn.disabled = false;
@@ -121,7 +180,16 @@ if (copyBtn) {
                 passwordOutput.style.color = '';
             }
             
-            alert('Error inesperado al generar la contraseña. Revisa la consola del navegador.');
+            let errorMsg = 'Error al acceder a la cámara. ';
+            if (error.name === 'NotAllowedError') {
+                errorMsg += 'Debes permitir el acceso a la cámara en tu navegador.';
+            } else if (error.name === 'NotFoundError') {
+                errorMsg += 'No se encontró ninguna cámara conectada.';
+            } else {
+                errorMsg += error.message;
+            }
+            
+            alert(errorMsg);
         }
     });
 }

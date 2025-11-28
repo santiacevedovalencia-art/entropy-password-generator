@@ -54,7 +54,8 @@ def add_security_headers(response):
         "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; "
         "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; "
         "font-src 'self' https://cdnjs.cloudflare.com; "
-        "img-src 'self' data:; "
+        "img-src 'self' data: blob:; "
+        "media-src 'self' blob:; "
         "connect-src 'self'"
     )
     # Referrer Policy
@@ -76,68 +77,98 @@ def generator_page():
 def privacy_page():
     return app.send_static_file("privacy.html")
 
-@app.route("/api/password", methods=["GET"])
+@app.route("/api/password", methods=["POST"])
 @rate_limit
 def api_password():
-    raw_length = request.args.get("length", "16")
-    
-    # Validación de entrada más estricta
-    if not raw_length or not raw_length.strip():
-        return jsonify({"error": "Parámetro 'length' es requerido"}), 400
+    """Nuevo endpoint que recibe datos de imagen desde el navegador"""
+    import hashlib
+    import random
+    import os
     
     try:
-        length = int(raw_length)
-    except ValueError:
-        return jsonify({"error": "length debe ser un número entero válido"}), 400
-
-    if length < 4 or length > 30:
-        return jsonify({"error": "La longitud debe estar entre 4 y 30"}), 400
-
-    frames_to_capture = max(1, math.ceil(length / 5))
-
-    logger = get_logger()
-    opener = CameraOpener(logger=logger)
-
-    try:
-        frame_data = capture_frames(
-            opener=opener,
-            frames=frames_to_capture,
-            interval=0.35,
-            timeout=2.0,
-            preview=False,
-            grid_min=8,
-            grid_max=12,
-            open_kwargs={
-                "preferred_index": 0,
-                "try_all": True,
-                "max_index": 3,
-                "retries": 3,
-                "delay": 0.5,
-                "diag": False,
-            },
-        )
-    except Exception as exc:
-        logger.write(f"ERROR generating password: {str(exc)}")
-        # No exponer detalles internos del error al usuario
-        return jsonify({
-            "error": "No se pudo acceder a la cámara. Verifica los permisos."
-        }), 500
-
-    password = generate_password(
-        frame_data,
-        length=length,
-        allowed_groups=DEFAULT_GROUPS,
-        required_groups=None,
-        extra_chars="",
-    )
-
-    return jsonify(
-        {
-            "password": password,
-            "length": len(password),
-            "frames_used": len(frame_data),
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({"error": "No se recibieron datos"}), 400
+        
+        length = data.get("length", 16)
+        image_data = data.get("imageData", [])  # Array de píxeles RGB
+        
+        # Validación
+        if not isinstance(length, int) or length < 4 or length > 30:
+            return jsonify({"error": "La longitud debe estar entre 4 y 30"}), 400
+        
+        if not image_data or len(image_data) < 100:
+            return jsonify({"error": "Datos de imagen insuficientes"}), 400
+        
+        # Construir entrada para el hash usando los datos de la imagen
+        digest_input = bytearray()
+        
+        # Agregar datos de píxeles
+        for pixel_value in image_data[:5000]:  # Limitar a 5000 valores
+            digest_input.append(int(pixel_value) & 0xFF)
+        
+        # Agregar timestamp
+        digest_input.extend(int(time.time() * 1000000).to_bytes(8, "little"))
+        
+        # Agregar entropía adicional del sistema
+        digest_input.extend(os.urandom(32))
+        
+        # Generar hash SHA-512
+        digest = hashlib.sha512(digest_input).digest()
+        
+        # Construir conjunto de caracteres
+        charset = ""
+        group_map = {
+            "upper": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+            "lower": "abcdefghijklmnopqrstuvwxyz",
+            "digits": "0123456789",
+            "symbols": "!@#$%&*?-_+=[]{}ñ"
         }
-    )
+        
+        for group in DEFAULT_GROUPS:
+            charset += group_map.get(group, "")
+        
+        # Generar contraseña usando el hash como fuente de entropía
+        password_chars = []
+        idx = 0
+        
+        # Asegurar al menos un carácter de cada grupo
+        for group in DEFAULT_GROUPS:
+            group_chars = group_map.get(group, "")
+            if group_chars:
+                byte = digest[idx % len(digest)]
+                idx += 1
+                password_chars.append(group_chars[byte % len(group_chars)])
+        
+        # Rellenar hasta la longitud deseada
+        while len(password_chars) < length:
+            byte = digest[idx % len(digest)]
+            idx += 1
+            password_chars.append(charset[byte % len(charset)])
+        
+        # Mezclar la contraseña usando el hash
+        for i in range(len(password_chars) - 1, 0, -1):
+            j = digest[idx % len(digest)] % (i + 1)
+            idx += 1
+            password_chars[i], password_chars[j] = password_chars[j], password_chars[i]
+        
+        password = "".join(password_chars[:length])
+        
+        logger = get_logger()
+        logger.write(f"PASSWORD generated successfully, length={length}, image_data_points={len(image_data)}")
+        
+        return jsonify({
+            "password": password,
+            "length": len(password)
+        })
+        
+    except Exception as exc:
+        logger = get_logger()
+        logger.write(f"ERROR generating password: {str(exc)}")
+        return jsonify({
+            "error": "Error al generar la contraseña"
+        }), 500
 
 if __name__ == "__main__":
     import os
