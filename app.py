@@ -1,18 +1,23 @@
-import math
 import time
+import hashlib
+import os
 from collections import defaultdict
 from flask import Flask, request, jsonify, make_response
 from functools import wraps
 
-from entropy_password_version_1_11 import (
-    CameraOpener,
-    get_logger,
-    capture_frames,
-    generate_password,
-    DEFAULT_GROUPS,
-)
-
 app = Flask(__name__, static_folder="public", static_url_path="")
+
+# Definir grupos de caracteres directamente
+DEFAULT_GROUPS = ("upper", "lower", "digits", "symbols")
+
+# Logger simple
+class SimpleLogger:
+    def write(self, message):
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+        print(f"{timestamp} {message}")
+
+def get_logger():
+    return SimpleLogger()
 
 # Rate limiting simple (en memoria)
 rate_limit_data = defaultdict(list)
