@@ -1,0 +1,17 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fondo del icono -->
+  <rect x="4" y="4" width="56" height="56" rx="16" fill="#2ECB71"/>
+
+  <!-- Letra E geométrica -->
+  <!-- Barra superior -->
+  <rect x="18" y="18" width="28" height="6" rx="3" fill="#FFFFFF"/>
+  <!-- Barra central (un poco más corta) -->
+  <rect x="18" y="29" width="20" height="6" rx="3" fill="#FFFFFF"/>
+  <!-- Barra inferior -->
+  <rect x="18" y="40" width="28" height="6" rx="3" fill="#FFFFFF"/>
+
+  <!-- Bits de entropía saliendo -->
+  <rect x="46" y="18" width="4" height="4" rx="2" fill="#0C0E12" opacity="0.9"/>
+  <rect x="48" y="26" width="4" height="4" rx="2" fill="#0C0E12" opacity="0.7"/>
+  <rect x="44" y="34" width="4" height="4" rx="2" fill="#0C0E12" opacity="0.5"/>
+</svg>
